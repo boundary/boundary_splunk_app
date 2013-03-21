@@ -1,0 +1,50 @@
+<h2 style="font-size: 32px;"><img src="http://boundary.com/wp-content/uploads/2013/02/BoundaryBrandMark.png" style="float: left; padding-right: 20px; padding-bottom: 20px;" align="left"/>Boundary Splunk App</h2>
+<div style="width: 800px; padding-right: 60px; border-right: 1px solid #ddd;">
+<p style="font-size: 16px;">Boundary enables customers to monitor and improve application performance. If you have business-critical services deployed in cloud or hybrid IT infrastructures, Boundary can help you ensure these services deliver optimal performance and uptime.</p>
+
+<p style="font-size: 16px;">The Boundary app for Splunk feeds information about app topology, latency, and app-to-app conversation information into your Splunk environment.</p>
+
+<table width="100%" style="border: 0; padding: 10px;">
+<tr>
+<td><img src="http://boundary.com/wp-content/uploads/2012/05/homeitopsbox1b.jpg" width="260"></td>
+<td><img src="http://boundary.com/wp-content/uploads/2012/05/homerealtimebox2.jpg" width="260"></td>
+<td><img src="http://boundary.com/wp-content/uploads/2012/05/homeitopsbox.jpg" width="260"></td>
+</table>
+
+<p style="font-size: 14px;">Unlike traditional application performance monitoring (APM) solutions, Boundary can monitor all the components that make up an application, regardless of the infrastructure or languages used. The solution automatically builds and updates a logical application topology and makes it fast and easy to identify the location and source of issues and bottlenecks. GitHub, Basho, Canonical, Yammer, Cloudant, and many other customers rely on Boundary solutions every day.</p>
+
+<p style="font-size: 14px;">For more information, please visit us at <a href="http://www.boundary.com">http://boundary.com/</a>.</p>
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+<h2 style="font-size: 24px">Getting Started</h2>
+<p style="font-size: 14px;">Configuring the Boundary Splunk app takes just a couple steps.</p>
+<h2 style="font-size: 18px;">Adding Your Credentials</h2>
+<p style="font-size: 14px;">First, open up the "boundary.conf" file in a text editor such as vim or nano. This file is located in $SPLUNK_HOME/etc/apps/boundary/local/boundary.conf. Then, add your Boundary "organization ID" and API key where directed at the top of the configuration file. You can find your organization ID and API key by logging in at http://app.boundary.com and clicking "Organization &raquo; Org Settings" at the top right. A completed file will look like:</p>
+
+<pre style="background: #ddd">
+[boundary]
+org_id=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+api_base=https://api.boundary.com
+meter_info_output=$SPLUNK_HOME/etc/apps/boundary/lookups/meter_info.csv
+discovery_output=$SPLUNK_HOME/etc/apps/boundary/lookups/discovery.csv
+app_map_output=$SPLUNK_HOME/etc/apps/boundary/lookups/app_map.csv
+host_to_app_map_output=$SPLUNK_HOME/etc/apps/boundary/lookups/host_to_app_map.csv
+app_to_app_output=$SPLUNK_HOME/etc/apps/boundary/lookups/app_to_app.csv
+</pre>
+
+<p>&nbsp;</p>
+
+<h2 style="font-size: 18px;">Applying the Configuration</h2>
+<p style="font-size: 14px;">There's just one last step: we need to apply this configuration. To do this, <code>cd</code> to $SPLUNK_HOME/etc/apps/boundary/bin and run the following command:</p>
+
+<pre style="background: #ddd">./configure</pre>
+<p style="font-size: 14px;">Finally, restart Splunk to reload the app with your configuration applied.</p>
+
+<h2 style="font-size: 18px;">And you're done!</h2>
+<p style="font-size: 14px;">With your configuration set, applied, and Splunk restarted, you're good to go!</p>
+
+<p style="font-size: 14px;">For support, please contact <a href="mailto:support@boundary.com">support@boundary.com</a>.</p>
+
+</div>
