@@ -6,7 +6,7 @@ The Boundary app for Splunk feeds information about app topology, latency, and a
 
 Unlike traditional application performance monitoring (APM) solutions, Boundary can monitor all the components that make up an application, regardless of the infrastructure or languages used. The solution automatically builds and updates a logical application topology and makes it fast and easy to identify the location and source of issues and bottlenecks. GitHub, Basho, Canonical, Yammer, Cloudant, and many other customers rely on Boundary solutions every day.
 
-For more information, please visit us at [http://boundary.com/][5].
+For more information, please visit us at http://boundary.com/.
 
 * * *
 
@@ -26,7 +26,7 @@ Once you've got it, head to Splunk's App Manager UI and choose the "Set Up" acti
 
 With your configuration set and Splunk restarted, you're good to go!
 
-For support, please contact [support@boundary.com][7].
+For support, please contact support@boundary.com.
 
  
 
