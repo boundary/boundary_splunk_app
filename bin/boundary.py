@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""Boundary Annotations API Client for Python.
+"""Boundary Events API Client for Python.
 
-See also: https://app.boundary.com/docs/annotations
+See also: https://app.boundary.com/docs/events_api
 """
 
 # Copyright 2011-2013, Boundary Inc.
@@ -37,11 +37,11 @@ import socket
 API_URL = 'https://api.boundary.com'
 
 
-class BoundaryAnnotations(object):
-    """Boundary Annotations API Client"""
+class BoundaryEvents(object):
+    """Boundary Events API Client"""
 
     def __init__(self, organization_id, api_key):
-        self.url = '/'.join([API_URL, organization_id, 'annotations'])
+        self.url = '/'.join([API_URL, organization_id, 'events'])
 
         # 'Python urllib2 Basic Auth Problem': http://bit.ly/KZDZNk
         b64_auth = base64.encodestring(
@@ -50,20 +50,20 @@ class BoundaryAnnotations(object):
 
         self.auth_header = ' '.join(['Basic', b64_auth])
 
-    def create_annotation(self, annotation):
-        """Creates an Annotation in Boundary.
+    def create_event(self, annotation):
+        """Creates an Event in Boundary.
 
-        @param annotation: Annotation Params per
-            https://app.boundary.com/docs/annotations
-        @type annotation: dict
+        @param event: Event Params per
+            https://app.boundary.com/docs/events_api
+        @type event: dict
 
         @return: Response from Boundary.
         @rtype: dict
         """
-        annotation_json = json.dumps(annotation)
+        event_json = json.dumps(event)
 
         req = urllib2.Request(
-            self.url, annotation_json, {'Content-type': 'application/json'}
+            self.url, event_json, {'Content-type': 'application/json'}
         )
 
         req.add_header('Content-Type', 'application/json')
@@ -100,10 +100,27 @@ def search_command(apiclient):
     try:
         results, _, _ = splunk.Intersplunk.getOrganizedResults()
         for result in results:
-            annotation = {
-                'type': result['_raw'], 'start_time': result['_time']
-            }
-            apiclient.create_annotation(annotation)
+            event = {
+                 'title' : result['_raw'],
+                 'message' : 'Results of a Splunk Search command:' + result['_raw'],
+                 'tags' : ["Splunk","search"],
+                 'status' : "OK",
+                 'severity' : "INFO",
+                 'source' : {
+                        'ref' : "Splunk-search",
+                        'type' : "instance"
+                 },
+                 'sender' : {
+                        'ref' : "Splunk",
+                        'type' : "Application"
+                 },
+                 'properties' : {
+                        'eventKey' : "Splunk-search",
+                        'sender' : "Splunk",
+                 },
+                 'fingerprintFields' : [ "eventKey","sender"],            
+	    }
+            apiclient.create_event(event)
     # TODO(gba) Catch less general exception.
     except Exception:
         stack = traceback.format_exc()
@@ -115,17 +132,29 @@ def search_command(apiclient):
 
 
 def alert_command(apiclient):
-    """Invokes Boundary Annotations as a Saved-Search Alert Command."""
-    annotation = {
-        'type':  os.environ.get('SPLUNK_ARG_4'),
-        'subtype': socket.gethostbyname(socket.gethostname()),
-        'links': [
-            {'rel': 'search', 'href': os.environ.get('SPLUNK_ARG_6')},
-            {'rel': 'results', 'href': os.environ.get('SPLUNK_ARG_8')}
-        ],
-        'tags': ['splunk']
+    """Invokes Boundary Events as a Saved-Search Alert Command."""
+    event = {
+                'title': os.environ.get('SPLUNK_ARG_4'),
+                 'message' : 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ os.environ.get(\'SPLUNK_ARG_8\') - ' + os.environ.get('SPLUNK_ARG_6'),
+                 'tags' : ["Splunk","alert"],
+                 'status': "OPEN",
+                 'severity': "ERROR",
+                 'source': {
+                        'ref': socket.gethostbyname(socket.gethostname()),
+                        'type':"instance"
+                 },
+                 'sender': {
+                        'ref': "Splunk",
+                        'type':"Application"
+                 },
+                 'properties': {
+                        'eventKey': "Splunk-alert",
+                        'source': socket.gethostbyname(socket.gethostname()),
+                        'sender': "Splunk",
+                 },
+                 'fingerprintFields': [ "eventKey","source","sender"]
     }
-    return apiclient.create_annotation(annotation)
+    return apiclient.create_event(event)
 
 
 def get_config_file():
@@ -150,7 +179,7 @@ def get_config_file():
 def setup_apiclient():
     """Sets up Boundary API Instance."""
     api_key, organization_id = get_api_credentials(get_config_file())
-    return BoundaryAnnotations(organization_id, api_key)
+    return BoundaryEvents(organization_id, api_key)
 
 
 def main():
