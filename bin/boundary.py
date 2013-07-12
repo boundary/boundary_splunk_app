@@ -50,7 +50,7 @@ class BoundaryEvents(object):
 
         self.auth_header = ' '.join(['Basic', b64_auth])
 
-    def create_event(self, annotation):
+    def create_event(self, event):
         """Creates an Event in Boundary.
 
         @param event: Event Params per
