@@ -33,6 +33,7 @@ import os
 import traceback
 import urllib2
 import socket
+import time
 
 API_URL = 'https://api.boundary.com'
 
@@ -71,8 +72,10 @@ class BoundaryEvents(object):
 
         # TODO(gba) Add error checking, since there basically isn't any.
         response = urllib2.urlopen(req)
+        contents = response.read()
+        response.close()
 
-        return json.load(response)
+        return contents
 
 
 def get_api_credentials(config_file):
@@ -100,14 +103,20 @@ def search_command(apiclient):
     try:
         results, _, _ = splunk.Intersplunk.getOrganizedResults()
         for result in results:
+            createdAt = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime( float(result['_time']) ))
+            title = result['_raw']
+            message = result['_raw']
+            if len(title) > 254:
+                    title = title[:254]
+                    message = message[:200]
             event = {
-                 'title' : result['_raw'],
-                 'message' : 'Results of a Splunk Search command:' + result['_raw'],
+                 'title' : title,
+                 'message' : 'Results of a Splunk Search command:' + message,
                  'tags' : ["Splunk","search"],
                  'status' : "OK",
                  'severity' : "INFO",
                  'source' : {
-                        'ref' : "Splunk-search",
+                        'ref' : result['host'],
                         'type' : "instance"
                  },
                  'sender' : {
@@ -118,7 +127,8 @@ def search_command(apiclient):
                         'eventKey' : "Splunk-search",
                         'sender' : "Splunk",
                  },
-                 'fingerprintFields' : [ "eventKey","sender"],            
+                 'fingerprintFields' : [ "eventKey","sender"],
+                 'createdAt' : createdAt
 	    }
             apiclient.create_event(event)
     # TODO(gba) Catch less general exception.
@@ -133,9 +143,12 @@ def search_command(apiclient):
 
 def alert_command(apiclient):
     """Invokes Boundary Events as a Saved-Search Alert Command."""
+    message = 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ os.environ.get(\'SPLUNK_ARG_8\') - ' + os.environ.get('SPLUNK_ARG_6')
+    if len(message) > 255:
+            message = message[:254]
     event = {
                 'title': os.environ.get('SPLUNK_ARG_4'),
-                 'message' : 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ os.environ.get(\'SPLUNK_ARG_8\') - ' + os.environ.get('SPLUNK_ARG_6'),
+                 'message' : message,
                  'tags' : ["Splunk","alert"],
                  'status': "OPEN",
                  'severity': "ERROR",
